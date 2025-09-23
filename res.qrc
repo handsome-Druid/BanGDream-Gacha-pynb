@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="res">
-    <file>res/tex_tiket_star5.png</file>
+    <file>res/icon.png</file>
+    <file>res/background.png</file>
+    <file>res/arrow_up.svg</file>
+    <file>res/arrow_down.svg</file>
   </qresource>
 </RCC>
