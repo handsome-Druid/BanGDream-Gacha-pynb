@@ -1,0 +1,12 @@
+name: gacha-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy
+  - numba
+  - pyqt=5
+  - pip
+  - pip:
+    - pyqt5-tools
