@@ -26,7 +26,7 @@ conda-meta/
 
 # PyInstaller
 *.manifest
-*.spec
+# *.spec
 
 # Tests and coverage
 .pytest_cache/

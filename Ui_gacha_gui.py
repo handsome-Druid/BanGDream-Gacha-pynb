@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\gzw10\Documents\workspace\test1\gacha_gui.ui'
+# Form implementation generated from reading ui file 'c:\Users\gzw10\Documents\codespace\test1\gacha_gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import bangdreamgacha_numba
+import ipaddress
 import random
 import time
 
@@ -236,9 +237,61 @@ import res_rc
 
 if __name__ == "__main__":
     import sys
+    from font_loader import init_application, init_fonts_after_app
+    
+    # 初始化应用程序（设置高DPI支持）
+    init_application()
+    
     app = QtWidgets.QApplication(sys.argv)
+    
+    # 加载字体
+    init_fonts_after_app(app)
+    
+    # 创建主窗口
     MainWindow = QtWidgets.QWidget()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    
+    # 添加业务逻辑
+    def random_seed():
+        seed = random.randint(0, 2**31 - 1)
+        ui.seed.setText(str(seed))
+
+    def run_simulation():
+        try:
+            total5 = ui.total5.value()
+            want5 = ui.want5.value()
+            want4 = ui.want4.value()
+            normal = 1 if ui.normal.isChecked() else 0
+            sims = int(ui.sims.text())
+            seed = int(ui.seed.text())
+
+            if want5 > total5:
+                raise ValueError("想要5星不能超过总数")
+
+            ui.status.setText("模拟中...")
+            ui.output.clear()
+            QtWidgets.QApplication.processEvents()  # 让界面更新
+
+            start=time.time()
+            arr = bangdreamgacha_numba.simulate_batch_numba(total5, want5, want4, normal, sims, seed)
+            exp, med, p90, worst = bangdreamgacha_numba.summarize(arr)
+            dur = time.time() - start
+
+            result = f"""期望抽卡次数: {exp}
+中位数抽卡次数: {med}
+90%玩家在以下抽数内集齐: {p90}
+非酋至多抽卡次数: {worst}
+总耗时： {dur:.3f}秒"""
+            ui.output.setText(result)
+            ui.status.setText("完成")
+        except Exception as e:
+            ui.output.setText(f"错误: {str(e)}")
+            ui.status.setText("错误")
+    
+    # 连接信号
+    ui.run_btn.clicked.connect(run_simulation)
+    ui.random_seed_btn.clicked.connect(random_seed)
+    
     MainWindow.show()
     sys.exit(app.exec_())
