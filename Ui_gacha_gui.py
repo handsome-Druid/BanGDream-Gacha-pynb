@@ -13,6 +13,19 @@ import bangdreamgacha_numba
 import ipaddress
 import random
 import time
+import traceback
+import tempfile
+import datetime
+
+
+def _safe_text(obj):
+    try:
+        return str(obj)
+    except Exception:
+        try:
+            return repr(obj)
+        except Exception:
+            return '<unprintable>'
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -215,7 +228,20 @@ class Ui_MainWindow(object):
             self.output.setText(result)
             self.status.setText("完成")
         except Exception as e:
-            self.output.setText(f"错误: {str(e)}")
+            tb = traceback.format_exc()
+            # 写入临时日志文件，便于打包后查看
+            try:
+                ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+                fn = f"gacha_error_{ts}.log"
+                p = tempfile.gettempdir()
+                path = p + "\\" + fn
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(tb)
+            except Exception:
+                pass
+            # 将简短信息显示在界面上，并在输出中包含 traceback 的前几行
+            short = f"错误: {_safe_text(e)}\n（详细堆栈已写入: {path if 'path' in locals() else 'N/A'}）"
+            self.output.setText(short)
             self.status.setText("错误")
 
     def retranslateUi(self, MainWindow):
@@ -286,7 +312,18 @@ if __name__ == "__main__":
             ui.output.setText(result)
             ui.status.setText("完成")
         except Exception as e:
-            ui.output.setText(f"错误: {str(e)}")
+            tb = traceback.format_exc()
+            try:
+                ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+                fn = f"gacha_error_{ts}.log"
+                p = tempfile.gettempdir()
+                path = p + "\\" + fn
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(tb)
+            except Exception:
+                pass
+            short = f"错误: {_safe_text(e)}\n（详细堆栈已写入: {path if 'path' in locals() else 'N/A'}）"
+            ui.output.setText(short)
             ui.status.setText("错误")
     
     # 连接信号
