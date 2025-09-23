@@ -1,0 +1,57 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Numba and cache artifacts
+*.nbc
+*.nbi
+numba_cache/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+pip-wheel-metadata/
+
+# Conda metadata
+conda-meta/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Tests and coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.log
+*~
+
+# Local env/config
+.env
+.env.*
+local_settings.py
