@@ -5,7 +5,6 @@ import time
 import numpy as np
 from numba import njit, prange
 
-# 与 fast 版保持逻辑一致：
 # 5★ 单卡阈值 0.005 累积；4★ 0.0075
 STEP_5 = 0.005
 STEP_4 = 0.0075
