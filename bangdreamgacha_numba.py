@@ -9,7 +9,7 @@ from numba import njit, prange
 STEP_5 = 0.005
 STEP_4 = 0.0075
 
-@njit(cache=False)
+@njit(cache=True)
 def simulate_one_round_numba(total_5, want_5, want_4, normal, rng_state):
     # rng_state: 128-bit xoroshiro like simple PRNG (we'll implement xorshift64*)
     def rand01(state):
