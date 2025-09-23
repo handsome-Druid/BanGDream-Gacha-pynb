@@ -13,7 +13,22 @@
 - 前往 [发行版页面](https://github.com/handsome-Druid/BanGDream-Gacha-pynb/releases) 下载最新版，解压后直接运行 `gacha_release.exe
 `。
 - 目前仅提供 Windows 发行版。
-- Linux 用户推荐使用控制台原版 bangdreamgacha_numba.py。
+- Linux 用户推荐使用控制台原版 `bangdreamgacha_numba.py`，可通过仓库内的 `environment.yml` 快速创建运行环境并启动程序：
+
+	1. 创建并激活 conda 环境（基于 `environment.yml`）：
+
+```bash
+conda env create -f environment.yml
+conda activate gacha-env
+```
+
+	2. 运行控制台程序：
+
+```bash
+python bangdreamgacha_numba.py
+```
+
+	说明：`environment.yml` 已包含 `python=3.9`、`numpy`、`numba` 以及通过 `pip` 安装的 `pyqt5-tools`（仅在需要 GUI/Designer 时使用）。如不使用 conda，也可手动用 `pip install numpy numba` 安装依赖。
 
 ## 使用说明
 
