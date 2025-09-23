@@ -4,7 +4,7 @@
 
 本程序为邦多利（BanG Dream!）玩家提供新卡池抽卡期望模拟。通过多线程高效模拟，帮助玩家预测抽到心仪新卡所需的平均抽卡次数，辅助理性规划资源，提升游戏体验。
 
-本项目基于 [控制台程序](https://gitee.com/handsome-druid/bangdream-gacha)（由 handsome-Druid 开发）进行图形界面化和功能扩展，原项目为控制台版本，欢迎参考和对比。
+本项目基于 [C++程序](https://gitee.com/handsome-druid/bangdream-gacha)（由 handsome-Druid 开发）进行图形界面化和功能扩展，使用numba库提升了20倍以上的性能，现在可以轻松处理1000万次以上的模拟。原项目为控制台版本，欢迎参考和对比。
 
 ## 安装教程
 
