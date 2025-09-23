@@ -55,3 +55,6 @@ desktop.ini
 .env
 .env.*
 local_settings.py
+
+# Code Runner
+tempCodeRunnerFile.py

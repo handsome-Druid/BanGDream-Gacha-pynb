@@ -9,30 +9,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import bangdreamgacha_numba
-import ipaddress
-import random
-import time
-import traceback
-import tempfile
-import datetime
 
-
-def _safe_text(obj):
-    try:
-        return str(obj)
-    except Exception:
-        try:
-            return repr(obj)
-        except Exception:
-            return '<unprintable>'
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1500, 477)
-        MainWindow.setMinimumSize(QtCore.QSize(1500, 477))
-        MainWindow.setMaximumSize(QtCore.QSize(1500, 477))
+        MainWindow.resize(750, 238)
+        MainWindow.setMinimumSize(QtCore.QSize(750, 238))
+        MainWindow.setMaximumSize(QtCore.QSize(750, 238))
         font = QtGui.QFont()
         font.setPointSize(14)
         MainWindow.setFont(font)
@@ -50,7 +34,7 @@ class Ui_MainWindow(object):
 "QSpinBox::down-arrow { image: url(:/res/res/arrow_down.svg); width: 12px; height: 8px; }\n"
 "")
         self.background_list = QtWidgets.QListView(MainWindow)
-        self.background_list.setGeometry(QtCore.QRect(0, 0, 1501, 491))
+        self.background_list.setGeometry(QtCore.QRect(0, 0, 750, 239))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.background_list.setFont(font)
@@ -61,188 +45,138 @@ class Ui_MainWindow(object):
         self.background_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.background_list.setObjectName("background_list")
         self.sims = QtWidgets.QLineEdit(MainWindow)
-        self.sims.setGeometry(QtCore.QRect(140, 290, 201, 21))
+        self.sims.setGeometry(QtCore.QRect(90, 146, 101, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.sims.setFont(font)
         self.sims.setObjectName("sims")
         self.label_total5 = QtWidgets.QLabel(MainWindow)
-        self.label_total5.setGeometry(QtCore.QRect(70, 230, 105, 19))
+        self.label_total5.setGeometry(QtCore.QRect(40, 108, 71, 21))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.label_total5.setFont(font)
         self.label_total5.setObjectName("label_total5")
         self.want4 = QtWidgets.QSpinBox(MainWindow)
-        self.want4.setGeometry(QtCore.QRect(500, 230, 31, 21))
+        self.want4.setGeometry(QtCore.QRect(330, 110, 31, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.want4.setFont(font)
         self.want4.setMouseTracking(False)
         self.want4.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.want4.setAcceptDrops(False)
+        self.want4.setStyleSheet("border: none")
         self.want4.setMinimum(0)
         self.want4.setMaximum(50)
         self.want4.setProperty("value", 0)
         self.want4.setObjectName("want4")
         self.status = QtWidgets.QLabel(MainWindow)
-        self.status.setGeometry(QtCore.QRect(30, 430, 121, 19))
+        self.status.setGeometry(QtCore.QRect(20, 210, 101, 20))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.status.setFont(font)
         self.status.setObjectName("status")
         self.want5 = QtWidgets.QSpinBox(MainWindow)
-        self.want5.setGeometry(QtCore.QRect(330, 230, 31, 21))
+        self.want5.setGeometry(QtCore.QRect(220, 110, 31, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.want5.setFont(font)
+        self.want5.setStyleSheet("border: none")
         self.want5.setMinimum(0)
         self.want5.setMaximum(50)
         self.want5.setProperty("value", 5)
         self.want5.setObjectName("want5")
         self.label_seed = QtWidgets.QLabel(MainWindow)
-        self.label_seed.setGeometry(QtCore.QRect(360, 290, 76, 19))
+        self.label_seed.setGeometry(QtCore.QRect(200, 140, 71, 31))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.label_seed.setFont(font)
         self.label_seed.setObjectName("label_seed")
         self.label_sims = QtWidgets.QLabel(MainWindow)
-        self.label_sims.setGeometry(QtCore.QRect(70, 290, 76, 19))
+        self.label_sims.setGeometry(QtCore.QRect(40, 140, 61, 31))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.label_sims.setFont(font)
         self.label_sims.setObjectName("label_sims")
         self.run_btn = QtWidgets.QPushButton(MainWindow)
-        self.run_btn.setGeometry(QtCore.QRect(1220, 180, 161, 141))
+        self.run_btn.setGeometry(QtCore.QRect(590, 70, 121, 111))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(30)
+        font.setPointSize(16)
         self.run_btn.setFont(font)
         self.run_btn.setStyleSheet("border: none; background: transparent; color: black;")
         self.run_btn.setFlat(True)
         self.run_btn.setObjectName("run_btn")
         self.normal = QtWidgets.QCheckBox(MainWindow)
-        self.normal.setGeometry(QtCore.QRect(70, 260, 177, 23))
+        self.normal.setGeometry(QtCore.QRect(40, 130, 171, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.normal.setFont(font)
         self.normal.setChecked(False)
         self.normal.setObjectName("normal")
         self.label_want4 = QtWidgets.QLabel(MainWindow)
-        self.label_want4.setGeometry(QtCore.QRect(400, 230, 105, 19))
+        self.label_want4.setGeometry(QtCore.QRect(260, 110, 71, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.label_want4.setFont(font)
         self.label_want4.setMouseTracking(False)
         self.label_want4.setFocusPolicy(QtCore.Qt.NoFocus)
         self.label_want4.setAcceptDrops(False)
         self.label_want4.setObjectName("label_want4")
         self.label_want5 = QtWidgets.QLabel(MainWindow)
-        self.label_want5.setGeometry(QtCore.QRect(230, 230, 105, 19))
+        self.label_want5.setGeometry(QtCore.QRect(150, 110, 71, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.label_want5.setFont(font)
         self.label_want5.setMouseTracking(False)
         self.label_want5.setObjectName("label_want5")
         self.total5 = QtWidgets.QSpinBox(MainWindow)
-        self.total5.setGeometry(QtCore.QRect(170, 230, 31, 21))
+        self.total5.setGeometry(QtCore.QRect(110, 110, 31, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.total5.setFont(font)
+        self.total5.setStyleSheet("border: none")
         self.total5.setMinimum(0)
         self.total5.setMaximum(50)
         self.total5.setProperty("value", 5)
         self.total5.setObjectName("total5")
         self.output = QtWidgets.QTextEdit(MainWindow)
-        self.output.setGeometry(QtCore.QRect(70, 350, 901, 121))
+        self.output.setGeometry(QtCore.QRect(40, 170, 851, 61))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(7)
         self.output.setFont(font)
         self.output.setStyleSheet("border: none; background: transparent;")
         self.output.setReadOnly(True)
         self.output.setObjectName("output")
         self.seed = QtWidgets.QLineEdit(MainWindow)
-        self.seed.setGeometry(QtCore.QRect(430, 290, 108, 21))
+        self.seed.setGeometry(QtCore.QRect(250, 146, 101, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.seed.setFont(font)
         self.seed.setObjectName("seed")
         self.random_seed_btn = QtWidgets.QPushButton(MainWindow)
-        self.random_seed_btn.setGeometry(QtCore.QRect(540, 290, 38, 21))
+        self.random_seed_btn.setGeometry(QtCore.QRect(350, 146, 41, 16))
         font = QtGui.QFont()
         font.setFamily("腾祥嘉丽大圆简")
-        font.setPointSize(12)
+        font.setPointSize(9)
         self.random_seed_btn.setFont(font)
         self.random_seed_btn.setStyleSheet("background: transparent; border: 1px solid rgba(255,255,255,0.6); color: white;")
         self.random_seed_btn.setObjectName("random_seed_btn")
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        # Connect signals
-        self.run_btn.clicked.connect(self.run_simulation)
-        self.random_seed_btn.clicked.connect(self.random_seed)
-
-    def random_seed(self):
-        seed = random.randint(0, 2**31 - 1)
-        self.seed.setText(str(seed))
-
-    def run_simulation(self):
-        try:
-            total5 = self.total5.value()
-            want5 = self.want5.value()
-            want4 = self.want4.value()
-            normal = 1 if self.normal.isChecked() else 0
-            sims = int(self.sims.text())
-            seed = int(self.seed.text())
-
-            if want5 > total5:
-                raise ValueError("想要5星不能超过总数")
-
-            self.status.setText("模拟中...")
-            self.output.clear()
-            QtWidgets.QApplication.processEvents()  # 让界面更新
-
-            start=time.time()
-            arr = bangdreamgacha_numba.simulate_batch_numba(total5, want5, want4, normal, sims, seed)
-            exp, med, p90, worst = bangdreamgacha_numba.summarize(arr)
-            dur = time.time() - start
-
-            result = f"""期望抽卡次数: {exp}
-中位数抽卡次数: {med}
-90%玩家在以下抽数内集齐: {p90}
-非酋至多抽卡次数: {worst}
-总耗时： {dur:.3f}秒"""
-            self.output.setText(result)
-            self.status.setText("完成")
-        except Exception as e:
-            tb = traceback.format_exc()
-            # 写入临时日志文件，便于打包后查看
-            try:
-                ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-                fn = f"gacha_error_{ts}.log"
-                p = tempfile.gettempdir()
-                path = p + "\\" + fn
-                with open(path, 'w', encoding='utf-8') as f:
-                    f.write(tb)
-            except Exception:
-                pass
-            # 将简短信息显示在界面上，并在输出中包含 traceback 的前几行
-            short = f"错误: {_safe_text(e)}\n（详细堆栈已写入: {path if 'path' in locals() else 'N/A'}）"
-            self.output.setText(short)
-            self.status.setText("错误")
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -259,76 +193,3 @@ class Ui_MainWindow(object):
         self.seed.setText(_translate("MainWindow", "123456789"))
         self.random_seed_btn.setText(_translate("MainWindow", " 随机 "))
 import res_rc
-
-
-if __name__ == "__main__":
-    import sys
-    from font_loader import init_application, init_fonts_after_app
-    
-    # 初始化应用程序（设置高DPI支持）
-    init_application()
-    
-    app = QtWidgets.QApplication(sys.argv)
-    
-    # 加载字体
-    init_fonts_after_app(app)
-    
-    # 创建主窗口
-    MainWindow = QtWidgets.QWidget()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    
-    # 添加业务逻辑
-    def random_seed():
-        seed = random.randint(0, 2**31 - 1)
-        ui.seed.setText(str(seed))
-
-    def run_simulation():
-        try:
-            total5 = ui.total5.value()
-            want5 = ui.want5.value()
-            want4 = ui.want4.value()
-            normal = 1 if ui.normal.isChecked() else 0
-            sims = int(ui.sims.text())
-            seed = int(ui.seed.text())
-
-            if want5 > total5:
-                raise ValueError("想要5星不能超过总数")
-
-            ui.status.setText("模拟中...")
-            ui.output.clear()
-            QtWidgets.QApplication.processEvents()  # 让界面更新
-
-            start=time.time()
-            arr = bangdreamgacha_numba.simulate_batch_numba(total5, want5, want4, normal, sims, seed)
-            exp, med, p90, worst = bangdreamgacha_numba.summarize(arr)
-            dur = time.time() - start
-
-            result = f"""期望抽卡次数: {exp}
-中位数抽卡次数: {med}
-90%玩家在以下抽数内集齐: {p90}
-非酋至多抽卡次数: {worst}
-总耗时： {dur:.3f}秒"""
-            ui.output.setText(result)
-            ui.status.setText("完成")
-        except Exception as e:
-            tb = traceback.format_exc()
-            try:
-                ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-                fn = f"gacha_error_{ts}.log"
-                p = tempfile.gettempdir()
-                path = p + "\\" + fn
-                with open(path, 'w', encoding='utf-8') as f:
-                    f.write(tb)
-            except Exception:
-                pass
-            short = f"错误: {_safe_text(e)}\n（详细堆栈已写入: {path if 'path' in locals() else 'N/A'}）"
-            ui.output.setText(short)
-            ui.status.setText("错误")
-    
-    # 连接信号
-    ui.run_btn.clicked.connect(run_simulation)
-    ui.random_seed_btn.clicked.connect(random_seed)
-    
-    MainWindow.show()
-    sys.exit(app.exec_())
