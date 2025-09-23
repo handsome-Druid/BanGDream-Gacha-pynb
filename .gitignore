@@ -58,3 +58,7 @@ local_settings.py
 
 # Code Runner
 tempCodeRunnerFile.py
+
+# PyQt5 generated files
+Ui_*.py
+res_rc.py
