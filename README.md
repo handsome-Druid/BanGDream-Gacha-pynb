@@ -15,6 +15,7 @@
 - 目前仅提供 Windows 发行版。
 - Linux 用户推荐使用控制台原版 `bangdreamgacha_numba.py`，可通过仓库内的 `environment.yml` 快速创建运行环境并启动程序：
 
+
 	1. 创建并激活 conda 环境（基于 `environment.yml`）：
 
 ```bash
