@@ -51,7 +51,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=['libimalloc.dll','python3.dll'],
+    upx_exclude=['libimalloc.dll','python3.dll','icudt.dll'],
     runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
@@ -61,4 +61,6 @@ exe = EXE(
     entitlements_file=None,
     optimize=2,
     icon=['res/tex_tiket_star5_R.ico'],
+    # 添加版本信息可以降低被安全软件误报的几率
+    version='version_info.txt',
 )
