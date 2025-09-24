@@ -57,7 +57,7 @@ desktop.ini
 local_settings.py
 
 # Code Runner
-tempCodeRunnerFile.py
+tempCodeRunnerFile.*
 
 # PyQt5 generated files
 Ui_*.py

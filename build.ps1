@@ -1,6 +1,6 @@
 # 1. 创建并激活环境
 if (-Not (Test-Path "C:\Users\$env:USERNAME\.conda\envs\gacha-env")) {
-    conda env create -f environment.yml -n gacha-env
+    conda init ; conda env create -f environment.yml -n gacha-env
 }
 conda activate gacha-env
 
