@@ -1,25 +1,43 @@
-# -*- mode: python ; coding: utf-8 -*-
-
-
 block_cipher = None
 
+import PyQt5  # 触发 PyQt5 hook
+
+hidden = [
+    'font_loader',
+    'bangdreamgacha_numba',
+    'Ui_gacha_gui',
+]
+
+excludes = [
+    'setuptools', 'pkg_resources', 'distutils', 'unittest', 'test', 'pydoc', 'doctest',
+    'http', 'xmlrpc', 'asyncio', 'wsgiref', 'logging.config', 'logging.handlers'
+]
+
+datas = [
+    ('res', 'res'),
+]
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('res', 'res')],
-    hiddenimports=['font_loader', 'bangdreamgacha_numba', 'Ui_gacha_gui', 'ipaddress', 'pkg_resources', 'pkg_resources._vendor.jaraco.functools', 'pkg_resources._vendor.jaraco.context', 'pkg_resources._vendor.jaraco.text'],
+    datas=datas,
+    hiddenimports=hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=excludes,
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=True,
+    noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+pyz = PYZ(
+    a.pure,
+    a.zipped_data,
+    cipher=block_cipher,
+)
 
 exe = EXE(
     pyz,
@@ -32,8 +50,8 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,
-    upx_exclude=[],
+    upx=True,
+    upx_exclude=['libimalloc.dll','python3.dll'],
     runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
@@ -41,5 +59,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['res\\tex_tiket_star5_R.ico'],
+    optimize=2,
+    icon=['res/tex_tiket_star5_R.ico'],
 )
