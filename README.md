@@ -54,22 +54,6 @@ python bangdreamgacha_numba.py
 
 BSD 3-Clause License
 
-## 开发者指南
-
-### 自动化发布
-
-本项目配置了 GitHub Actions 自动化构建和发布流程：
-
-- **自动触发**: 推送 `v*` 格式的标签时自动构建 Release
-- **手动触发**: 在 Actions 页面可手动运行构建
-- **详细说明**: 参见 [RELEASE-GUIDE.md](./RELEASE-GUIDE.md)
-
-快速发布新版本：
-```bash
-git tag v1.3.5  # 创建版本标签
-git push origin v1.3.5  # 推送标签，触发自动构建
-```
-
 ### 本地开发环境
 
 ## 仓库地址
