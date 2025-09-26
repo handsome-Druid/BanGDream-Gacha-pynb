@@ -105,8 +105,8 @@ jobs:
         
         # 复制主程序
         if (Test-Path ".\dist\release.exe") {
-          Copy-Item ".\dist\release.exe" ".\release-files\BanGDream-Gacha-v${{ github.ref_name }}.exe"
-          Write-Host "✓ Copied executable as BanGDream-Gacha-v${{ github.ref_name }}.exe"
+          Copy-Item ".\dist\release.exe" ".\release-files\BanGDream-Gacha-${{ github.ref_name }}.exe"
+          Write-Host "✓ Copied executable as BanGDream-Gacha-${{ github.ref_name }}.exe"
         }
         
         # 复制说明文件
@@ -123,7 +123,7 @@ jobs:
         $pythonVer = "${{ env.PYTHON_VERSION }}"
         $buildTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC'
         
-        $versionInfo = "BanG Dream! 抽卡期望模拟器 - v$version`n`n构建信息:`n- 构建时间: $buildTime`n- 源码版本: $sha`n- Python版本: $pythonVer`n- 构建环境: GitHub Actions (Windows)`n`n使用说明:`n1. 直接运行 BanGDream-Gacha-v$version.exe`n2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击`"更多信息`"→`"仍要运行`"`n3. 详细使用方法请参考 README.md`n`n注意: 本程序使用自签名证书，无法完全消除安全警告。"
+        $versionInfo = "BanG Dream! 抽卡期望模拟器 - $version`n`n构建信息:`n- 构建时间: $buildTime`n- 源码版本: $sha`n- Python版本: $pythonVer`n- 构建环境: GitHub Actions (Windows)`n`n使用说明:`n1. 直接运行 BanGDream-Gacha-v$version.exe`n2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击`"更多信息`"→`"仍要运行`"`n3. 详细使用方法请参考 README.md`n`n注意: 本程序使用自签名证书，无法完全消除安全警告。"
         
         $versionInfo | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
         
@@ -145,7 +145,7 @@ jobs:
           ## 🎮 BanG Dream! 抽卡期望模拟器 ${{ github.ref_name }}
           
           ### 📥 下载说明
-          - 下载 `BanGDream-Gacha-v${{ github.ref_name }}.exe` 并直接运行
+          - 下载 `BanGDream-Gacha-${{ github.ref_name }}.exe` 并直接运行
           - Windows 10/11 系统，无需安装额外依赖
           - 首次运行可能需要点击"更多信息"→"仍要运行"来跳过 SmartScreen 警告
           
