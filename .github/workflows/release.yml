@@ -6,7 +6,7 @@ on:
       - 'v*'  # 触发条件：推送 v* 格式的标签（如 v1.3.4）
   workflow_dispatch:  # 允许手动触发
 
-# 添加必要权限
+# 添加必要权限以解决 403 错误
 permissions:
   contents: write  # 需要写权限来创建 release
   packages: read   # 可能需要读取包权限
@@ -35,19 +35,16 @@ jobs:
       shell: pwsh
       run: |
         conda activate ${{ env.CONDA_ENV }}
-        # 确保 PyQt5 工具可用
         pip install pyqt5-tools pyinstaller
         
     - name: Generate UI and resource files
       shell: pwsh
       run: |
         conda activate ${{ env.CONDA_ENV }}
-        # 生成 UI 文件
         if (Test-Path ".\gacha_gui.ui") {
           pyuic5 .\gacha_gui.ui -x -o .\Ui_gacha_gui.py
           Write-Host "✓ UI file generated"
         }
-        # 生成资源文件
         if (Test-Path ".\res.qrc") {
           pyrcc5 .\res.qrc -o .\res_rc.py
           Write-Host "✓ Resource file generated"
@@ -78,10 +75,7 @@ jobs:
         $exePath = ".\dist\release.exe"
         if (Test-Path $exePath) {
           try {
-            # 创建自签名证书（仅用于标识，不能完全消除 SmartScreen 警告）
             $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=BanGDream-Gacha Developer" -KeySpec Signature -KeyLength 2048 -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" -CertStoreLocation "Cert:\CurrentUser\My" -KeyUsage DigitalSignature -NotAfter (Get-Date).AddYears(1)
-            
-            # 签名可执行文件
             $result = Set-AuthenticodeSignature -FilePath $exePath -Certificate $cert -HashAlgorithm SHA256
             
             if ($result.Status -eq "Valid" -or $result.Status -eq "UnknownError") {
@@ -100,16 +94,13 @@ jobs:
     - name: Prepare release artifacts
       shell: pwsh
       run: |
-        # 创建发布文件夹
         New-Item -ItemType Directory -Force -Path ".\release-files"
         
-        # 复制主程序
         if (Test-Path ".\dist\release.exe") {
           Copy-Item ".\dist\release.exe" ".\release-files\BanGDream-Gacha-${{ github.ref_name }}.exe"
           Write-Host "✓ Copied executable as BanGDream-Gacha-${{ github.ref_name }}.exe"
         }
         
-        # 复制说明文件
         @("README.md", "LICENSE") | ForEach-Object {
           if (Test-Path $_) {
             Copy-Item $_ ".\release-files\"
@@ -117,15 +108,13 @@ jobs:
           }
         }
         
-        # 创建版本信息文件
         $version = "${{ github.ref_name }}"
         $sha = "${{ github.sha }}"
         $pythonVer = "${{ env.PYTHON_VERSION }}"
         $buildTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC'
         
-        $versionInfo = "BanG Dream! 抽卡期望模拟器 - $version`n`n构建信息:`n- 构建时间: $buildTime`n- 源码版本: $sha`n- Python版本: $pythonVer`n- 构建环境: GitHub Actions (Windows)`n`n使用说明:`n1. 直接运行 BanGDream-Gacha-v$version.exe`n2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击`"更多信息`"→`"仍要运行`"`n3. 详细使用方法请参考 README.md`n`n注意: 本程序使用自签名证书，无法完全消除安全警告。"
-        
-        $versionInfo | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
+        $versionContent = "BanG Dream! 抽卡期望模拟器 - $version`n`n构建信息:`n- 构建时间: $buildTime`n- 源码版本: $sha`n- Python版本: $pythonVer`n- 构建环境: GitHub Actions (Windows)`n`n使用说明:`n1. 直接运行 BanGDream-Gacha-v$version.exe`n2. 首次运行可能会被 Windows Defender SmartScreen 拦截`n3. 详细使用方法请参考 README.md`n`n注意: 本程序使用自签名证书，无法完全消除安全警告。"
+        $versionContent | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
         
     - name: Get current date
       id: date
