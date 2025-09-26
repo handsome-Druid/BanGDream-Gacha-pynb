@@ -29,6 +29,14 @@ def run():
     MainWindow = QtWidgets.QWidget()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    # 确保输出区域文字为白色（覆盖局部样式缺省）
+    try:
+        _style = ui.output.styleSheet() or ""
+        if "color:" not in _style:
+            sep = "\n" if _style and not _style.endswith("\n") else ""
+            ui.output.setStyleSheet(f"{_style}{sep}color: white;")
+    except Exception:
+        pass
 
     # 业务逻辑（集中管理，避免重复）
     def random_seed():
@@ -56,12 +64,41 @@ def run():
             exp, med, p90, worst = bangdreamgacha_numba.summarize(arr)
             dur = time.time() - start
 
-            result = f"""期望抽卡次数: {exp}
-中位数抽卡次数: {med}
-90%玩家在以下抽数内集齐: {p90}
-非酋至多抽卡次数: {worst}
-总耗时： {dur:.3f}秒"""
-            ui.output.setText(result)
+            # 先对抽卡次数取整（四舍五入），再计算星石消耗
+            exp_i = int(round(exp))
+            med_i = int(round(med))
+            p90_i = int(round(p90))
+            worst_i = int(round(worst))
+
+            # 使用 HTML 表格让“花费”一列垂直对齐显示
+            result_html = f"""
+<div style="color: #ffffff;">
+    <table style="border-collapse: collapse;">
+        <tr>
+            <td style="padding-right: 12px; white-space: nowrap;">期望抽卡次数: {exp}</td>
+            <td style="padding: 0 8px; white-space: nowrap;">花费</td>
+            <td style="white-space: nowrap;">{exp_i*250}星石</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 12px; white-space: nowrap;">中位数抽卡次数: {med}</td>
+            <td style="padding: 0 8px; white-space: nowrap;">花费</td>
+            <td style="white-space: nowrap;">{med_i*250}星石</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 12px; white-space: nowrap;">90%玩家在以下抽数内集齐: {p90}</td>
+            <td style="padding: 0 8px; white-space: nowrap;">花费</td>
+            <td style="white-space: nowrap;">{p90_i*250}星石</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 12px; white-space: nowrap;">非酋至多抽卡次数: {worst}</td>
+            <td style="padding: 0 8px; white-space: nowrap;">花费</td>
+            <td style="white-space: nowrap;">{worst_i*250}星石</td>
+        </tr>
+    </table>
+    <div style="margin-top: 4px;">总耗时： {dur:.3f}秒</div>
+</div>
+"""
+            ui.output.setHtml(result_html)
             ui.status.setText("完成")
         except Exception as e:
             tb = traceback.format_exc()

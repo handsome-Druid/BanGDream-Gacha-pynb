@@ -119,7 +119,7 @@ QSpinBox::down-arrow { image: url(:/res/res/arrow_down.svg); width: 12px; height
     <rect>
      <x>315</x>
      <y>111</y>
-     <width>31</width>
+     <width>25</width>
      <height>16</height>
     </rect>
    </property>
@@ -175,7 +175,7 @@ QSpinBox::down-arrow { image: url(:/res/res/arrow_down.svg); width: 12px; height
     <rect>
      <x>205</x>
      <y>111</y>
-     <width>31</width>
+     <width>25</width>
      <height>16</height>
     </rect>
    </property>
@@ -338,7 +338,7 @@ QSpinBox::down-arrow { image: url(:/res/res/arrow_down.svg); width: 12px; height
     <rect>
      <x>95</x>
      <y>111</y>
-     <width>31</width>
+     <width>25</width>
      <height>16</height>
     </rect>
    </property>
