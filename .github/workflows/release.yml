@@ -113,22 +113,21 @@ jobs:
         }
         
         # 创建版本信息文件
-        @"
-BanG Dream! 抽卡期望模拟器 - v${{ github.ref_name }}
-
-构建信息:
-- 构建时间: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
-- 源码版本: ${{ github.sha }}
-- Python版本: ${{ env.PYTHON_VERSION }}
-- 构建环境: GitHub Actions (Windows)
-
-使用说明:
-1. 直接运行 BanGDream-Gacha-v${{ github.ref_name }}.exe
-2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击"更多信息"→"仍要运行"
-3. 详细使用方法请参考 README.md
-
-注意: 本程序使用自签名证书，无法完全消除安全警告。
-"@ | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
+        $version = "${{ github.ref_name }}"
+        $sha = "${{ github.sha }}"
+        $pythonVer = "${{ env.PYTHON_VERSION }}"
+        $buildTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC'
+        
+        $versionInfo = "BanG Dream! 抽卡期望模拟器 - v$version`n`n构建信息:`n- 构建时间: $buildTime`n- 源码版本: $sha`n- Python版本: $pythonVer`n- 构建环境: GitHub Actions (Windows)`n`n使用说明:`n1. 直接运行 BanGDream-Gacha-v$version.exe`n2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击`"更多信息`"→`"仍要运行`"`n3. 详细使用方法请参考 README.md`n`n注意: 本程序使用自签名证书，无法完全消除安全警告。"
+        
+        $versionInfo | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
+        
+    - name: Get current date
+      id: date
+      shell: pwsh
+      run: |
+        $currentTime = Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC'
+        echo "date=$currentTime" >> $env:GITHUB_OUTPUT
         
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
