@@ -1,0 +1,183 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 触发条件：推送 v* 格式的标签（如 v1.3.4）
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  PYTHON_VERSION: '3.9'
+  CONDA_ENV: gacha-env
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: ${{ env.PYTHON_VERSION }}
+        environment-file: environment.yml
+        activate-environment: ${{ env.CONDA_ENV }}
+        
+    - name: Install additional dependencies
+      shell: pwsh
+      run: |
+        conda activate ${{ env.CONDA_ENV }}
+        # 确保 PyQt5 工具可用
+        pip install pyqt5-tools pyinstaller
+        
+    - name: Generate UI and resource files
+      shell: pwsh
+      run: |
+        conda activate ${{ env.CONDA_ENV }}
+        # 生成 UI 文件
+        if (Test-Path ".\gacha_gui.ui") {
+          pyuic5 .\gacha_gui.ui -x -o .\Ui_gacha_gui.py
+          Write-Host "✓ UI file generated"
+        }
+        # 生成资源文件
+        if (Test-Path ".\res.qrc") {
+          pyrcc5 .\res.qrc -o .\res_rc.py
+          Write-Host "✓ Resource file generated"
+        }
+        
+    - name: Build executable with PyInstaller
+      shell: pwsh
+      run: |
+        conda activate ${{ env.CONDA_ENV }}
+        pyinstaller --clean .\release.spec
+        Write-Host "✓ Executable built"
+        
+    - name: Verify build output
+      shell: pwsh
+      run: |
+        $exePath = ".\dist\release.exe"
+        if (Test-Path $exePath) {
+          $fileSize = (Get-Item $exePath).Length
+          Write-Host "✓ Executable found: $exePath ($([math]::Round($fileSize/1MB, 2)) MB)"
+        } else {
+          Write-Error "✗ Executable not found at $exePath"
+          exit 1
+        }
+        
+    - name: Create self-signed certificate and sign executable
+      shell: pwsh
+      run: |
+        $exePath = ".\dist\release.exe"
+        if (Test-Path $exePath) {
+          try {
+            # 创建自签名证书（仅用于标识，不能完全消除 SmartScreen 警告）
+            $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=BanGDream-Gacha Developer" -KeySpec Signature -KeyLength 2048 -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" -CertStoreLocation "Cert:\CurrentUser\My" -KeyUsage DigitalSignature -NotAfter (Get-Date).AddYears(1)
+            
+            # 签名可执行文件
+            $result = Set-AuthenticodeSignature -FilePath $exePath -Certificate $cert -HashAlgorithm SHA256
+            
+            if ($result.Status -eq "Valid" -or $result.Status -eq "UnknownError") {
+              Write-Host "✓ Executable signed successfully"
+              Write-Host "  Status: $($result.Status)"
+              Write-Host "  Signer: $($result.SignerCertificate.Subject)"
+            } else {
+              Write-Warning "⚠ Signing completed with status: $($result.Status)"
+            }
+          } catch {
+            Write-Warning "⚠ Code signing failed: $($_.Exception.Message)"
+            Write-Host "Continuing without signature..."
+          }
+        }
+        
+    - name: Prepare release artifacts
+      shell: pwsh
+      run: |
+        # 创建发布文件夹
+        New-Item -ItemType Directory -Force -Path ".\release-files"
+        
+        # 复制主程序
+        if (Test-Path ".\dist\release.exe") {
+          Copy-Item ".\dist\release.exe" ".\release-files\BanGDream-Gacha-v${{ github.ref_name }}.exe"
+          Write-Host "✓ Copied executable as BanGDream-Gacha-v${{ github.ref_name }}.exe"
+        }
+        
+        # 复制说明文件
+        @("README.md", "LICENSE") | ForEach-Object {
+          if (Test-Path $_) {
+            Copy-Item $_ ".\release-files\"
+            Write-Host "✓ Copied $_"
+          }
+        }
+        
+        # 创建版本信息文件
+        @"
+BanG Dream! 抽卡期望模拟器 - v${{ github.ref_name }}
+
+构建信息:
+- 构建时间: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
+- 源码版本: ${{ github.sha }}
+- Python版本: ${{ env.PYTHON_VERSION }}
+- 构建环境: GitHub Actions (Windows)
+
+使用说明:
+1. 直接运行 BanGDream-Gacha-v${{ github.ref_name }}.exe
+2. 首次运行可能会被 Windows Defender SmartScreen 拦截，点击"更多信息"→"仍要运行"
+3. 详细使用方法请参考 README.md
+
+注意: 本程序使用自签名证书，无法完全消除安全警告。
+"@ | Out-File -FilePath ".\release-files\版本说明.txt" -Encoding UTF8
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: BanG Dream! 抽卡模拟器 ${{ github.ref_name }}
+        body: |
+          ## 🎮 BanG Dream! 抽卡期望模拟器 ${{ github.ref_name }}
+          
+          ### 📥 下载说明
+          - 下载 `BanGDream-Gacha-v${{ github.ref_name }}.exe` 并直接运行
+          - Windows 10/11 系统，无需安装额外依赖
+          - 首次运行可能需要点击"更多信息"→"仍要运行"来跳过 SmartScreen 警告
+          
+          ### ✨ 功能特点
+          - 高性能蒙特卡洛模拟（支持千万次级别模拟）
+          - 支持 fes 池、普限池、常驻池等不同卡池类型
+          - 实时显示期望抽卡次数、中位数、90% 分位数等统计数据
+          - 美观的图形界面，支持高DPI显示
+          
+          ### 🔧 使用方法
+          1. 输入当期5星新卡总数
+          2. 设置想要抽取的5星、4星数量
+          3. 选择是否为常驻池（50抽保底）
+          4. 点击"开始模拟"查看结果
+          
+          ### 📊 构建信息
+          - **构建时间**: ${{ steps.date.outputs.date }}
+          - **源码版本**: `${{ github.sha }}`
+          - **Python版本**: ${{ env.PYTHON_VERSION }}
+          
+          ### 📄 开源协议
+          BSD 3-Clause License - 详见 LICENSE 文件
+        files: |
+          release-files/*
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Build Summary
+      shell: pwsh
+      run: |
+        Write-Host ""
+        Write-Host "🎉 构建完成！" -ForegroundColor Green
+        Write-Host "📦 发布版本: ${{ github.ref_name }}" -ForegroundColor Cyan
+        Write-Host "🔗 Release 页面: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "📋 构建产物:" -ForegroundColor Yellow
+        Get-ChildItem ".\release-files\" | ForEach-Object {
+          $size = if ($_.PSIsContainer) { "文件夹" } else { "$([math]::Round($_.Length/1MB, 2)) MB" }
+          Write-Host "  - $($_.Name) ($size)" -ForegroundColor White
+        }

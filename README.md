@@ -10,9 +10,9 @@
 
 ## 安装教程
 
-- 前往 [发行版页面](https://github.com/handsome-Druid/BanGDream-Gacha-pynb/releases) 下载最新版，解压后直接运行 `gacha_release.exe
-`。
-- 目前仅提供 Windows 发行版。
+- 前往 [发行版页面](https://github.com/handsome-Druid/BanGDream-Gacha-pynb/releases) 下载最新版，直接运行 `BanGDream-Gacha-v{版本号}.exe`。
+- 目前仅提供 Windows 发行版，支持 Windows 10/11。
+- 首次运行可能需要点击"更多信息"→"仍要运行"来跳过 SmartScreen 安全警告。
 - Linux 用户推荐使用控制台原版 `bangdreamgacha_numba.py`，可通过仓库内的 `environment.yml` 快速创建运行环境并启动程序：
 
 1. 创建并激活 conda 环境（基于 `environment.yml`）：
@@ -53,6 +53,24 @@ python bangdreamgacha_numba.py
 ## 开源协议
 
 BSD 3-Clause License
+
+## 开发者指南
+
+### 自动化发布
+
+本项目配置了 GitHub Actions 自动化构建和发布流程：
+
+- **自动触发**: 推送 `v*` 格式的标签时自动构建 Release
+- **手动触发**: 在 Actions 页面可手动运行构建
+- **详细说明**: 参见 [RELEASE-GUIDE.md](./RELEASE-GUIDE.md)
+
+快速发布新版本：
+```bash
+git tag v1.3.5  # 创建版本标签
+git push origin v1.3.5  # 推送标签，触发自动构建
+```
+
+### 本地开发环境
 
 ## 仓库地址
 
