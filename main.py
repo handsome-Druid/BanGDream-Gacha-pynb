@@ -3,7 +3,6 @@ import time
 import traceback
 import tempfile
 import datetime
-import random
 import secrets
 from PyQt5 import QtWidgets
 from Ui_gacha_gui import Ui_MainWindow
@@ -25,7 +24,7 @@ def run():
     # 初始化应用（高DPI等）
     init_application()
     app = QtWidgets.QApplication(sys.argv)
-    init_fonts_after_app(app)
+    init_fonts_after_app()
 
     main_window = QtWidgets.QWidget()
     ui = Ui_MainWindow()

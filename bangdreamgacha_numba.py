@@ -10,20 +10,68 @@ STEP_5 = 0.005
 STEP_4 = 0.0075
 
 @njit(cache=False)
-def simulate_one_round_numba(total_5, want_5, want_4, normal, rng_state):
-    # rng_state: 128-bit xoroshiro like simple PRNG (we'll implement xorshift64*)
-    def rand01(state):
-        # xorshift64*
-        x = state[0]
-        x ^= (x << 13) & 0xFFFFFFFFFFFFFFFF
-        x ^= (x >> 7)
-        x ^= (x << 17) & 0xFFFFFFFFFFFFFFFF
-        state[0] = x
-        return (x & 0xFFFFFFFFFFFFFFFF) / 18446744073709551616.0
-    def rand_int(state, a, b):
-        r = rand01(state)
-        return a + int(r * (b - a + 1))
+def rand01(state):
+    x = state[0]
+    x ^= (x << 13) & 0xFFFFFFFFFFFFFFFF
+    x ^= (x >> 7)
+    x ^= (x << 17) & 0xFFFFFFFFFFFFFFFF
+    state[0] = x
+    return (x & 0xFFFFFFFFFFFFFFFF) / 18446744073709551616.0
 
+@njit(cache=False)
+def rand_int(state, a, b):
+    r = rand01(state)
+    return a + int(r * (b - a + 1))
+
+@njit(cache=False)
+def try_draw_5star(mask5, have5, step5_total, rng_state):
+    r = rand01(rng_state)
+    if r < step5_total:
+        idx = int(r / STEP_5)
+        bit = 1 << idx
+        if (mask5 & bit) == 0:
+            mask5 |= bit
+            have5 += 1
+    return mask5, have5
+
+@njit(cache=False)
+def try_draw_4star(mask4, have4, step4_total, rng_state):
+    r = rand01(rng_state)
+    if r < step4_total:
+        idx = int(r / STEP_4)
+        bit = 1 << idx
+        if (mask4 & bit) == 0:
+            mask4 |= bit
+            have4 += 1
+    return mask4, have4
+
+@njit(cache=False)
+def check_finish(draws, have5, have4, want_5, want_4):
+    choose = (draws + 100) // 300
+    return (have5 + have4 + choose >= want_5 + want_4 and
+            have5 + choose >= want_5 and
+            have4 + choose >= want_4)
+
+@njit(cache=False)
+def _draw_50_logic(mask5, have5, total_5, want_5, rng_state):
+    roll = rand_int(rng_state, 1, total_5)
+    if 1 <= roll <= want_5:
+        bit = 1 << (roll - 1)
+        if (mask5 & bit) == 0:
+            mask5 |= bit
+            have5 += 1
+    return mask5, have5
+
+@njit(cache=False)
+def _draw_normal_logic(mask5, have5, mask4, have4, want_5, want_4, step5_total, step4_total, rng_state):
+    if want_5 > 0:
+        mask5, have5 = try_draw_5star(mask5, have5, step5_total, rng_state)
+    if want_4 > 0:
+        mask4, have4 = try_draw_4star(mask4, have4, step4_total, rng_state)
+    return mask5, have5, mask4, have4
+
+@njit(cache=False)
+def simulate_one_round_numba(total_5, want_5, want_4, normal, rng_state):
     mask5 = 0
     mask4 = 0
     have5 = 0
@@ -34,50 +82,13 @@ def simulate_one_round_numba(total_5, want_5, want_4, normal, rng_state):
 
     while True:
         draws += 1
-        if normal == 1 and (draws % 50 == 0) and want_5 > 0:
-            if total_5 > 0:
-                roll = rand_int(rng_state, 1, total_5)
-                if 1 <= roll <= want_5:
-                    bit = 1 << (roll - 1)
-                    if (mask5 & bit) == 0:
-                        mask5 |= bit
-                        have5 += 1
+        if normal == 1 and (draws % 50 == 0) and want_5 > 0 and total_5 > 0:
+            mask5, have5 = _draw_50_logic(mask5, have5, total_5, want_5, rng_state)
         else:
-            if want_5 > 0:
-                r = rand01(rng_state)
-                if r < step5_total:
-                    idx = int(r / STEP_5)
-                    bit = 1 << idx
-                    if (mask5 & bit) == 0:
-                        mask5 |= bit
-                        have5 += 1
-            else:
-                if want_4 > 0:
-                    r = rand01(rng_state)
-                    if r < step4_total:
-                        idx = int(r / STEP_4)
-                        bit = 1 << idx
-                        if (mask4 & bit) == 0:
-                            mask4 |= bit
-                            have4 += 1
-                choose = (draws + 100) // 300
-                if (have5 + have4 + choose >= want_5 + want_4 and
-                    have5 + choose >= want_5 and
-                    have4 + choose >= want_4):
-                    break
-                continue
-            if want_4 > 0:
-                r = rand01(rng_state)
-                if r < step4_total:
-                    idx = int(r / STEP_4)
-                    bit = 1 << idx
-                    if (mask4 & bit) == 0:
-                        mask4 |= bit
-                        have4 += 1
-        choose = (draws + 100) // 300
-        if (have5 + have4 + choose >= want_5 + want_4 and
-            have5 + choose >= want_5 and
-            have4 + choose >= want_4):
+            mask5, have5, mask4, have4 = _draw_normal_logic(
+                mask5, have5, mask4, have4, want_5, want_4, step5_total, step4_total, rng_state
+            )
+        if check_finish(draws, have5, have4, want_5, want_4):
             break
     return draws
 

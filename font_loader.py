@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-字体初始化模块
-在应用启动时自动加载自定义字体，确保UI能够正常使用腾祥嘉丽大圆简字体
+字体初始化模块 - 在应用启动时自动加载自定义字体，确保UI能够正常使用腾祥嘉丽大圆简字体
 """
 
 import os
@@ -9,19 +8,11 @@ import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
 
 
-def load_custom_fonts():
+def _load_font_from_resource(font_db):
     """
-    加载自定义字体
-    这个函数会在应用启动时被调用，将字体文件加载到系统中
+    尝试从资源文件加载字体
     """
-    font_db = QtGui.QFontDatabase()
-    
-    # 尝试多种方式加载字体
-    font_loaded = False
-    
-    # 方法1: 从资源文件加载
     try:
-        # 从资源中加载字体数据
         font_data = QtCore.QFile(":/res/TengXiangJiaLiDaYuanJian-1.ttf")
         if font_data.open(QtCore.QIODevice.ReadOnly):
             data = font_data.readAll()
@@ -30,42 +21,62 @@ def load_custom_fonts():
                 font_families = font_db.applicationFontFamilies(font_id)
                 if font_families and "腾祥嘉丽大圆简" in font_families:
                     print("成功从资源文件加载字体: 腾祥嘉丽大圆简")
-                    font_loaded = True
+                    return True
     except Exception as e:
         print(f"从资源加载字体失败: {e}")
-    
-    # 方法2: 从文件系统加载
+    return False
+
+def _get_font_paths():
+    """
+    获取所有可能的字体文件路径
+    """
+    font_paths = [
+        "res/TengXiangJiaLiDaYuanJian-1.ttf",
+        os.path.join(os.path.dirname(__file__), "res", "TengXiangJiaLiDaYuanJian-1.ttf"),
+    ]
+    if hasattr(sys, '_MEIPASS'):
+        font_paths.append(os.path.join(sys._MEIPASS, "res", "TengXiangJiaLiDaYuanJian-1.ttf"))
+    return font_paths
+
+def _load_font_from_filesystem(font_db):
+    """
+    尝试从文件系统加载字体
+    """
+    font_paths = _get_font_paths()
+    for font_path in font_paths:
+        try:
+            if os.path.exists(font_path):
+                font_id = font_db.addApplicationFont(font_path)
+                if font_id != -1:
+                    font_families = font_db.applicationFontFamilies(font_id)
+                    print(f"从文件加载字体，字体家族: {font_families}")
+                    if font_families:
+                        print(f"成功从文件加载字体: {font_path}")
+                        return True
+        except Exception as e:
+            print(f"从文件 {font_path} 加载字体失败: {e}")
+    return False
+
+def _print_available_chinese_fonts(font_db):
+    """
+    打印可用的中文字体，帮助调试
+    """
+    available_families = font_db.families()
+    chinese_fonts = [f for f in available_families if any(ord(c) > 127 for c in f)]
+    print(f"可用的中文字体: {chinese_fonts[:10]}")  # 只显示前10个
+
+def load_custom_fonts():
+    """
+    加载自定义字体
+    这个函数会在应用启动时被调用，将字体文件加载到系统中
+    """
+    font_db = QtGui.QFontDatabase()
+    font_loaded = _load_font_from_resource(font_db)
     if not font_loaded:
-        font_paths = [
-            "res/TengXiangJiaLiDaYuanJian-1.ttf",  # 相对路径
-            os.path.join(os.path.dirname(__file__), "res", "TengXiangJiaLiDaYuanJian-1.ttf"),  # 绝对路径
-        ]
-        
-        # 如果是打包后的exe，添加临时目录路径
-        if hasattr(sys, '_MEIPASS'):
-            font_paths.append(os.path.join(sys._MEIPASS, "res", "TengXiangJiaLiDaYuanJian-1.ttf"))
-        
-        for font_path in font_paths:
-            try:
-                if os.path.exists(font_path):
-                    font_id = font_db.addApplicationFont(font_path)
-                    if font_id != -1:
-                        font_families = font_db.applicationFontFamilies(font_id)
-                        print(f"从文件加载字体，字体家族: {font_families}")
-                        if font_families:
-                            font_loaded = True
-                            print(f"成功从文件加载字体: {font_path}")
-                            break
-            except Exception as e:
-                print(f"从文件 {font_path} 加载字体失败: {e}")
-    
+        font_loaded = _load_font_from_filesystem(font_db)
     if not font_loaded:
         print("警告: 无法加载腾祥嘉丽大圆简字体，将使用系统默认字体")
-        # 列出所有可用字体，帮助调试
-        available_families = font_db.families()
-        chinese_fonts = [f for f in available_families if any(ord(c) > 127 for c in f)]
-        print(f"可用的中文字体: {chinese_fonts[:10]}")  # 只显示前10个
-    
+        _print_available_chinese_fonts(font_db)
     return font_loaded
 
 
@@ -95,7 +106,7 @@ def init_application():
     return True
 
 
-def init_fonts_after_app(app):
+def init_fonts_after_app():
     """
     在QApplication创建后初始化字体
     """

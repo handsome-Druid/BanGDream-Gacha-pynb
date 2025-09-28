@@ -37,6 +37,43 @@ jobs:
         conda activate ${{ env.CONDA_ENV }}
         pip install pyqt5-tools pyinstaller
         
+    - name: Update version info from Git tag
+      shell: pwsh
+      run: |
+        # 获取当前的Git标签版本
+        $gitTag = "${{ github.ref_name }}"
+        Write-Host "📋 当前Git标签: $gitTag" -ForegroundColor Cyan
+        
+        # 解析版本号（支持 v1.2.3 或 1.2.3 格式）
+        if ($gitTag -match '^v?(\d+)\.(\d+)\.(\d+)$') {
+          $major = [int]$matches[1]
+          $minor = [int]$matches[2]
+          $build = [int]$matches[3]
+          $revision = 0  # 修订版本号默认为0
+          
+          $newVersionString = "$major.$minor.$build.$revision"
+          Write-Host "解析的版本号: $newVersionString" -ForegroundColor Green
+          
+          # 读取并更新版本信息文件
+          if (Test-Path ".\version_info.txt") {
+            $content = Get-Content ".\version_info.txt" -Raw -Encoding UTF8
+            
+            # 更新所有版本相关字段
+            $content = $content -replace 'filevers=\(\d+,\s*\d+,\s*\d+,\s*\d+\)', "filevers=($major, $minor, $build, $revision)"
+            $content = $content -replace 'prodvers=\(\d+,\s*\d+,\s*\d+,\s*\d+\)', "prodvers=($major, $minor, $build, $revision)"
+            $content = $content -replace "StringStruct\('FileVersion',\s*'[\d\.]+'\)", "StringStruct('FileVersion', '$newVersionString')"
+            $content = $content -replace "StringStruct\('ProductVersion',\s*'[\d\.]+'\)", "StringStruct('ProductVersion', '$newVersionString')"
+            
+            # 写回文件
+            $content | Set-Content ".\version_info.txt" -Encoding UTF8
+            Write-Host "✓ 版本信息已更新为: $newVersionString" -ForegroundColor Green
+          } else {
+            Write-Host "⚠ version_info.txt 文件不存在" -ForegroundColor Yellow
+          }
+        } else {
+          Write-Host "⚠ 无法解析Git标签格式: $gitTag (期望: v1.2.3)" -ForegroundColor Yellow
+        }
+        
     - name: Download and setup UPX
       shell: pwsh
       run: |
