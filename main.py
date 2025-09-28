@@ -26,9 +26,9 @@ def run():
     app = QtWidgets.QApplication(sys.argv)
     init_fonts_after_app(app)
 
-    MainWindow = QtWidgets.QWidget()
+    main_window = QtWidgets.QWidget()
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui.setupUi(main_window)
     # 确保输出区域文字为白色（覆盖局部样式缺省）
     try:
         _style = ui.output.styleSheet() or ""
@@ -118,7 +118,7 @@ def run():
     ui.run_btn.clicked.connect(run_simulation)
     ui.random_seed_btn.clicked.connect(random_seed)
 
-    MainWindow.show()
+    main_window.show()
     sys.exit(app.exec_())
 
 
