@@ -4,6 +4,7 @@ import traceback
 import tempfile
 import datetime
 import random
+import secrets
 from PyQt5 import QtWidgets
 from Ui_gacha_gui import Ui_MainWindow
 import bangdreamgacha_numba
@@ -40,7 +41,8 @@ def run():
 
     # 业务逻辑（集中管理，避免重复）
     def random_seed():
-        seed = random.randint(0, 2**31 - 1)
+        # 使用加密安全的随机数生成，避免 SonarLint 关于弱随机数的告警（S2245）
+        seed = secrets.randbelow(2**31)
         ui.seed.setText(str(seed))
 
     def run_simulation():
