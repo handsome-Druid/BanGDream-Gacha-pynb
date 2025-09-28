@@ -37,6 +37,33 @@ jobs:
         conda activate ${{ env.CONDA_ENV }}
         pip install pyqt5-tools pyinstaller
         
+    - name: Download and setup UPX
+      shell: pwsh
+      run: |
+        $upxVersion = "5.0.2"
+        $upxUrl = "https://github.com/upx/upx/releases/download/v$upxVersion/upx-$upxVersion-win64.zip"
+        $upxZip = "upx-$upxVersion-win64.zip"
+        $upxDir = "upx-$upxVersion-win64"
+        
+        Write-Host "📥 Downloading UPX $upxVersion..."
+        Invoke-WebRequest -Uri $upxUrl -OutFile $upxZip
+        
+        Write-Host "📂 Extracting UPX..."
+        Expand-Archive -Path $upxZip -DestinationPath "." -Force
+        
+        Write-Host "🔧 Adding UPX to PATH..."
+        $upxPath = Join-Path $PWD $upxDir
+        echo "$upxPath" >> $env:GITHUB_PATH
+        
+        Write-Host "✅ UPX setup completed"
+        Write-Host "UPX location: $upxPath"
+        
+    - name: Verify UPX installation
+      shell: pwsh
+      run: |
+        upx --version
+        Write-Host "✓ UPX is ready for PyInstaller"
+        
     - name: Generate UI and resource files
       shell: pwsh
       run: |
